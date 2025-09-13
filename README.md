@@ -14,10 +14,11 @@ No CineEstante, cada usuário tem uma experiência completa para registrar e com
 * **Perfil Personalizado:** Crie e personalize seu perfil com foto e uma auto descrição para que a comunidade conheça seu gosto para filmes.
 * **Estante Virtual:** Adicione filmes que você já assistiu, dê sua nota e escreva uma crítica para organizar seu histórico pessoal..
 * **Interação Social:** Curta e reaja às críticas de outros usuários, valorizando as melhores análises da comunidade.
-
+* **Login e Cadastro:** Sistema completo de cadastro (signup) e login para acessar a plataforma.
+  
 💬 **Para a Comunidade:**
 
-* **Debates por Nicho:** Participe de comunidades separadas por gênero (terror, comédia, ficção científica) e discuta seus filmes favoritos com pessoas de gostos parecidos.
+* **Grupos:** Permite que usuários criem ou participem de grupos baseados em gêneros (terror, ficção científica, etc.) ou nichos específicos para debater e compartilhar recomendações com pessoas de gostos similares.
 * **Comentários em Sagas:** Entre em páginas dedicadas a franquias completas e debata sobre a saga como um todo.
 * **Ranking Comunitário:** Descubra os filmes mais bem avaliados pela comunidade através de um ranking que pode ser filtrado por período (mês, ano ou geral).
 
