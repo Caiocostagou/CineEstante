@@ -10,6 +10,7 @@ Jira:
 ScreenCast Youtube: https://youtu.be/SKyZwryabZ8
 
 👥Grupo:
+
 Caio Costa Gouveia - ccg@cesar.school
 
 Gabriel Ricardo Araújo - gra@cesar.school
