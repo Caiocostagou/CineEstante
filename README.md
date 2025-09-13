@@ -5,9 +5,11 @@ Links da Entrega01👇
 
 Figma Protótipo: https://www.figma.com/design/3QfBXKDWDtn0uVHkLKV5XE/CineEstante-%E2%80%93-Prot%C3%B3tipo-Lo-Fi.?node-id=0-1&p=f&t=IMbCER7xbJwViRwv-0
 
-Jira:
+Jira:https://cineestante.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog
 
 ScreenCast Youtube: https://youtu.be/SKyZwryabZ8
+
+Histórias: https://docs.google.com/document/d/1gLsDAXkUmLZK5js7OKfs5OLxCrkXJu-9lgcbZwYkCd8/edit?usp=sharing
 
 👥Grupo:
 
