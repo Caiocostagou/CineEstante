@@ -12,14 +12,11 @@ No CineEstante, cada usuário tem uma experiência completa para registrar e com
 👤 **Para Cinéfilos e Usuários:**
 
 * **Perfil Personalizado:** Crie e personalize seu perfil com foto e uma auto descrição para que a comunidade conheça seu gosto para filmes.
-* **Estante Virtual:** Adicione filmes que você já assistiu, dê sua nota e escreva uma crítica para organizar seu histórico pessoal.
-* **Avaliações com Spoiler Alert:** Escreva suas opiniões e marque-as como "contém spoiler" para não estragar a experiência de outros usuários.
-* **Lista "Quero Assistir":** Organize suas próximas sessões de cinema criando uma lista de filmes que você deseja ver no futuro.
+* **Estante Virtual:** Adicione filmes que você já assistiu, dê sua nota e escreva uma crítica para organizar seu histórico pessoal..
 * **Interação Social:** Curta e reaja às críticas de outros usuários, valorizando as melhores análises da comunidade.
 
 💬 **Para a Comunidade:**
 
-* **Recomendações Pessoais:** Sugira filmes diretamente para seus amigos e receba notificações quando alguém te recomendar uma obra.
 * **Debates por Nicho:** Participe de comunidades separadas por gênero (terror, comédia, ficção científica) e discuta seus filmes favoritos com pessoas de gostos parecidos.
 * **Comentários em Sagas:** Entre em páginas dedicadas a franquias completas e debata sobre a saga como um todo.
 * **Ranking Comunitário:** Descubra os filmes mais bem avaliados pela comunidade através de um ranking que pode ser filtrado por período (mês, ano ou geral).
