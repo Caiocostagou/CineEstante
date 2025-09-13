@@ -1,11 +1,11 @@
 # 🎬 CineEstante
 
 
-#📌 Visão Geral
+# 📌 Visão Geral
 
 Esta é uma plataforma online desenvolvida para conectar amantes do cinema, permitindo que compartilhem e descubram opiniões sobre filmes de forma interativa e social. Com o CineEstante, usuários podem construir um registro de suas experiências cinematográficas, interagir com uma comunidade apaixonada e encontrar sua próxima sessão de cinema.
 
-#👥Grupo:
+# 👥Grupo:
 
 🙋‍♂️Caio Costa Gouveia - ccg@cesar.school
 
