@@ -5,6 +5,25 @@
 
 Esta é uma plataforma online desenvolvida para conectar amantes do cinema, permitindo que compartilhem e descubram opiniões sobre filmes de forma interativa e social. Com o CineEstante, usuários podem construir um registro de suas experiências cinematográficas, interagir com uma comunidade apaixonada e encontrar sua próxima sessão de cinema.
 
+### 📑 Funcionalidades
+
+No CineEstante, cada usuário tem uma experiência completa para registrar e compartilhar sua jornada cinematográfica.
+
+👤 **Para Cinéfilos e Usuários:**
+
+* **Perfil Personalizado:** Crie e personalize seu perfil com foto e uma auto descrição para que a comunidade conheça seu gosto para filmes.
+* **Estante Virtual:** Adicione filmes que você já assistiu, dê sua nota e escreva uma crítica para organizar seu histórico pessoal.
+* **Avaliações com Spoiler Alert:** Escreva suas opiniões e marque-as como "contém spoiler" para não estragar a experiência de outros usuários.
+* **Lista "Quero Assistir":** Organize suas próximas sessões de cinema criando uma lista de filmes que você deseja ver no futuro.
+* **Interação Social:** Curta e reaja às críticas de outros usuários, valorizando as melhores análises da comunidade.
+
+💬 **Para a Comunidade:**
+
+* **Recomendações Pessoais:** Sugira filmes diretamente para seus amigos e receba notificações quando alguém te recomendar uma obra.
+* **Debates por Nicho:** Participe de comunidades separadas por gênero (terror, comédia, ficção científica) e discuta seus filmes favoritos com pessoas de gostos parecidos.
+* **Comentários em Sagas:** Entre em páginas dedicadas a franquias completas e debata sobre a saga como um todo.
+* **Ranking Comunitário:** Descubra os filmes mais bem avaliados pela comunidade através de um ranking que pode ser filtrado por período (mês, ano ou geral).
+
 # 👥Grupo:
 
 🙋‍♂️Caio Costa Gouveia - ccg@cesar.school
