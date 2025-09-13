@@ -41,6 +41,7 @@ Figma: https://www.figma.com/design/3QfBXKDWDtn0uVHkLKV5XE/CineEstante-%E2%80%93
 
 Histórias: https://docs.google.com/document/d/1gLsDAXkUmLZK5js7OKfs5OLxCrkXJu-9lgcbZwYkCd8/edit?tab=t.0#heading=h.ihj8dpur0xla
 
-<img width="992" height="397" alt="Captura de Tela (213)" src="https://github.com/user-attachments/assets/ab6ba376-143c-4a0d-acc9-a5582f1b9fc9" />
+<img width="1039" height="398" alt="Captura de Tela (214)" src="https://github.com/user-attachments/assets/6fe3143c-38bc-4498-91e2-666938162416" />
+
 
 
