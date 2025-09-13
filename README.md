@@ -10,17 +10,17 @@ Jira: https://cineestante.atlassian.net/jira/software/projects/SCRUM/boards/1/ba
 ScreenCast Youtube: https://youtu.be/SKyZwryabZ8
 
 Histórias: https://docs.google.com/document/d/1gLsDAXkUmLZK5js7OKfs5OLxCrkXJu-9lgcbZwYkCd8/edit?usp=sharing
-
-<details><summary><h3><b>Sprint 1</b></h3></summary>
-
-<img width="992" height="397" alt="Captura de Tela (213)" src="https://github.com/user-attachments/assets/ab6ba376-143c-4a0d-acc9-a5582f1b9fc9" />
-
-
 👥Grupo:
 
 🙋‍♂️Caio Costa Gouveia - ccg@cesar.school
 
 🙋‍♂️Gabriel Ricardo Araújo - gra@cesar.school
 
-🙋‍♂️<img width="992" height="397" alt="Captura de Tela (213)" src="https://github.com/user-attachments/assets/002eec47-fddb-4fea-b0a6-1bb64e946078" />
-Julio Cesar Coutinho Holanda Cavalcanti - jcchc@cesar.school
+🙋‍♂️Julio Cesar Coutinho Holanda Cavalcanti - jcchc@cesar.school
+
+<details><summary><h3><b>Entrega01 1</b></h3></summary>
+
+ScreenCast Youtube: https://youtu.be/SKyZwryabZ8
+<img width="992" height="397" alt="Captura de Tela (213)" src="https://github.com/user-attachments/assets/ab6ba376-143c-4a0d-acc9-a5582f1b9fc9" />
+
+
