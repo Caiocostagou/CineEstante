@@ -1,0 +1,43 @@
+{% extends "usuarios/base.html" %}
+
+{% block title %}Meu Perfil - CineEstante{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card profile-card text-white">
+            <div class="card-body">
+                <h1 class="card-title text-center mb-4">Perfil de {{ user.username }}</h1>
+
+                <div class="text-center mb-3">
+                    {% if perfil.foto_perfil %}
+                        <img src="{{ perfil.foto_perfil.url }}" alt="Foto de Perfil" width="150" class="img-thumbnail rounded-circle">
+                    {% else %}
+                        <div class="alert alert-dark">Nenhuma foto de perfil.</div>
+                    {% endif %}
+                </div>
+
+                <hr class="border-secondary">
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="descricao" class="form-label">Sua descrição:</label>
+                        <textarea name="descricao" id="descricao" class="form-control" rows="4">{{ perfil.descricao }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="foto_perfil" class="form-label">Alterar foto:</label>
+                        <input type="file" name="foto_perfil" id="foto_perfil" class="form-control" accept="image/*">
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
