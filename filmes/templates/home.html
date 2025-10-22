@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Início - CineEstante</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .film-grain {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        }
+        
+        /* Hero Carousel Styles */
+        .hero-slide {
+            transition: opacity 0.8s ease-in-out;
+        }
+        
+        .hero-backdrop {
+            transition: transform 20s ease-out, opacity 0.5s ease;
+        }
+        
+        .hero-slide.active .hero-backdrop {
+            transform: scale(1.1);
+        }
+        
+        /* Movie Card Hover Effects */
+        .movie-card {
+            transition: all 0.3s ease;
+        }
+        
+        .movie-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.4);
+        }
+        
+        /* Top 10 Badge */
+        .top10-badge {
+            font-size: 6rem;
+            font-weight: 900;
+            -webkit-text-stroke: 2px #8b5cf6;
+            color: transparent;
+        }
+        
+        /* Glow Effect */
+        .glow-purple {
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.7);
+        }
+
+        /* Trailer reveal animation */
+        .trailer-reveal {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .show-trailer .trailer-reveal {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 min-h-screen film-grain">
+    
+    <!-- Navbar -->
+    <nav class="bg-black bg-opacity-50 backdrop-blur-md border-b border-purple-500/20 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-film text-purple-400 text-2xl"></i>
+                    <span class="text-white text-xl font-bold">CineEstante</span>
+                </div>
+                <div class="flex items-center gap-6">
+                    <a href="/" class="text-purple-400 font-semibold">
+                        <i class="fas fa-home"></i> <span class="hidden sm:inline ml-1">Início</span>
+                    </a>
+                    <a href="/filmes/lista/" class="text-gray-300 hover:text-white transition">
+                        <i class="fas fa-book"></i> <span class="hidden sm:inline ml-1">Estante</span>
+                    </a>
+                    <a href="/filmes/buscar/" class="text-gray-300 hover:text-white transition">
+                        <i class="fas fa-search"></i> <span class="hidden sm:inline ml-1">Buscar</span>
+                    </a>
+                    {% if user.is_authenticated %}
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" class="flex items-center gap-2 text-white">
+                            <img src="{{ request.user.perfil.get_foto_url }}" 
+                                 class="w-8 h-8 rounded-full border-2 border-purple-400 object-cover">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div x-show="open" 
+                             @click.outside="open = false"
+                             x-transition
+                             class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-purple-500/30 py-2 z-50">
+                            <a href="/usuarios/perfil/" class="block px-4 py-2 text-gray-300 hover:bg-purple-600 hover:text-white">
+                                <i class="fas fa-user mr-2"></i> Meu Perfil
+                            </a>
+                            <a href="/usuarios/editar-perfil/" class="block px-4 py-2 text-gray-300 hover:bg-purple-600 hover:text-white">
+                                <i class="fas fa-cog mr-2"></i> Configurações
+                            </a>
+                            <hr class="border-gray-700 my-2">
+                            <a href="/usuarios/logout/" class="block px-4 py-2 text-red-400 hover:bg-red-600 hover:text-white">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Sair
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <a href="/usuarios/login/" class="text-white bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition">
+                        Entrar
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section - Filmes em Cartaz (COM TRAILERS após 3 segundos) -->
+    <div class="relative overflow-hidden h-[600px]" x-data="heroCarousel()">
+        <template x-for="(filme, index) in filmes" :key="index">
+            <div x-show="currentSlide === index" 
+                 @mouseenter="startTrailerTimer(index)"
+                 @mouseleave="cancelTrailerTimer()"
+                 x-transition:enter="transition ease-out duration-800"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 class="hero-slide absolute inset-0"
+                 :class="{ 'active': currentSlide === index, 'show-trailer': showingTrailer === index }">
+                
+                <!-- Background Image -->
+                <div class="relative h-full">
+                    <img :src="filme.backdrop" 
+                         :alt="filme.titulo"
+                         class="hero-backdrop w-full h-full object-cover"
+                         :style="showingTrailer === index ? 'opacity: 0' : 'opacity: 1'">
+                    
+                    <!-- Trailer (aparece após 3 segundos) -->
+                    <div class="absolute inset-0 bg-black trailer-reveal"
+                         x-show="showingTrailer === index"
+                         x-transition>
+                        <iframe 
+                            :src="filme.trailer_url + '?autoplay=1&mute=1&controls=0&loop=1&playlist=' + filme.trailer_url.split('/').pop()"
+                            class="w-full h-full"
+                            frameborder="0"
+                            allow="autoplay; encrypted-media"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    
+                    <div class="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/80 to-transparent pointer-events-none"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent pointer-events-none"></div>
+                </div>
+                
+                <!-- Content -->
+                <div class="absolute inset-0 flex items-center pointer-events-none">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                        <div class="max-w-2xl">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="inline-block bg-purple-600 text-white px-4 py-1 rounded-full text-sm font-semibold animate-pulse">
+                                    <i class="fas fa-fire mr-1"></i> EM CARTAZ AGORA
+                                </div>
+                                <div class="inline-block bg-red-600 text-white px-4 py-1 rounded-full text-sm font-semibold"
+                                     x-show="showingTrailer === index"
+                                     x-transition>
+                                    <i class="fas fa-play mr-1"></i> TRAILER TOCANDO
+                                </div>
+                            </div>
+                            <h1 class="text-5xl md:text-7xl font-black text-white mb-4 drop-shadow-2xl" x-text="filme.titulo"></h1>
+                            <div class="flex items-center gap-4 text-gray-300 mb-6">
+                                <span><i class="fas fa-calendar mr-2"></i><span x-text="filme.ano"></span></span>
+                                <span><i class="fas fa-clock mr-2"></i><span x-text="filme.duracao"></span></span>
+                                <span><i class="fas fa-film mr-2"></i><span x-text="filme.genero"></span></span>
+                                <div class="flex items-center gap-1">
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <span class="font-bold text-white" x-text="filme.nota"></span>
+                                </div>
+                            </div>
+                            <p class="text-gray-300 text-lg mb-8 leading-relaxed" x-text="filme.sinopse"></p>
+                            <div class="flex gap-4 pointer-events-auto">
+                                <button @click="window.open(filme.trailer_url.replace('/embed/', '/watch?v='), '_blank')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3 rounded-lg transition shadow-lg glow-purple flex items-center gap-2">
+                                    <i class="fas fa-play"></i> Ver Trailer Completo
+                                </button>
+                                <a :href="'/filmes/filme/' + filme.id + '/'" class="bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 text-white font-bold px-8 py-3 rounded-lg transition flex items-center gap-2">
+                                    <i class="fas fa-info-circle"></i> Mais Informações
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        
+        <!-- Navigation Dots -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
+            <template x-for="(filme, index) in filmes" :key="index">
+                <button @click="currentSlide = index; resetAutoplay(); cancelTrailerTimer();"
+                        :class="currentSlide === index ? 'w-12 bg-purple-600' : 'w-3 bg-white bg-opacity-50'"
+                        class="h-3 rounded-full transition-all duration-300 hover:bg-purple-400"></button>
+            </template>
+        </div>
+        
+        <!-- Navigation Arrows -->
+        <button @click="prevSlide()" 
+                class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-80 text-white p-4 rounded-full transition z-10">
+            <i class="fas fa-chevron-left text-2xl"></i>
+        </button>
+        <button @click="nextSlide()" 
+                class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-80 text-white p-4 rounded-full transition z-10">
+            <i class="fas fa-chevron-right text-2xl"></i>
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+        
+        <!-- Top 10 Semanal (SEM TRAILERS) -->
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-white flex items-center gap-3">
+                    <i class="fas fa-trophy text-yellow-400"></i>
+                    Top 10 da Semana
+                </h2>
+                <a href="#" class="text-purple-400 hover:text-purple-300 flex items-center gap-2 transition">
+                    Ver Tudo <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {% for filme in top10_semanal %}
+                <div class="movie-card bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-purple-500/10 group cursor-pointer">
+                    <div class="relative aspect-[2/3]">
+                        <img src="{{ filme.poster }}" 
+                             alt="{{ filme.titulo }}"
+                             class="w-full h-full object-cover">
+                        
+                        <!-- Top 10 Badge -->
+                        <div class="absolute bottom-0 left-0 top10-badge leading-none p-2">
+                            {{ filme.posicao }}
+                        </div>
+                        
+                        <!-- Hover Overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                            <form method="POST" action="{% url 'filmes:adicionar_filme_estante' filme.id %}" class="mb-2">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg text-sm transition">
+                                    <i class="fas fa-plus mr-1"></i> Adicionar
+                                </button>
+                            </form>
+                            <a href="{% url 'filmes:filme_detalhes' filme.id %}" class="block bg-gray-700 hover:bg-gray-600 text-white py-2 rounded-lg text-sm transition text-center">
+                                <i class="fas fa-info-circle mr-1"></i> Detalhes
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="p-3">
+                        <h3 class="text-white font-semibold text-sm mb-1 truncate">{{ filme.titulo }}</h3>
+                        <div class="flex justify-between items-center text-xs text-gray-400">
+                            <span>{{ filme.ano }}</span>
+                            <div class="flex items-center gap-1">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span class="font-bold">{{ filme.nota }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Indicações para Você (SEM TRAILERS) -->
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-white flex items-center gap-3">
+                    <i class="fas fa-lightbulb text-purple-400"></i>
+                    Indicações para Você
+                </h2>
+                <a href="#" class="text-purple-400 hover:text-purple-300 flex items-center gap-2 transition">
+                    Ver Tudo <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {% for filme in indicacoes %}
+                <div class="movie-card bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-purple-500/10 group cursor-pointer">
+                    <div class="relative aspect-[2/3]">
+                        <img src="{{ filme.poster }}" 
+                             alt="{{ filme.titulo }}"
+                             class="w-full h-full object-cover">
+                        
+                        <!-- Hover Overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                            <form method="POST" action="{% url 'filmes:adicionar_filme_estante' filme.id %}" class="mb-2">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg text-sm transition">
+                                    <i class="fas fa-plus mr-1"></i> Adicionar
+                                </button>
+                            </form>
+                            <a href="{% url 'filmes:filme_detalhes' filme.id %}" class="block bg-gray-700 hover:bg-gray-600 text-white py-2 rounded-lg text-sm transition text-center">
+                                <i class="fas fa-info-circle mr-1"></i> Detalhes
+                            </a>
+                        </div>
+                        
+                        <!-- Rating Badge -->
+                        <div class="absolute top-2 right-2 bg-black bg-opacity-80 text-yellow-400 px-2 py-1 rounded-full text-xs font-bold">
+                            <i class="fas fa-star"></i> {{ filme.nota }}
+                        </div>
+                    </div>
+                    
+                    <div class="p-3">
+                        <h3 class="text-white font-semibold text-sm mb-1 truncate">{{ filme.titulo }}</h3>
+                        <div class="flex justify-between items-center text-xs text-gray-400">
+                            <span>{{ filme.ano }}</span>
+                            <span class="truncate ml-2">{{ filme.genero }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Em Alta Agora (SEM TRAILERS) -->
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-white flex items-center gap-3">
+                    <i class="fas fa-fire text-red-500"></i>
+                    Em Alta Agora
+                </h2>
+                <a href="#" class="text-purple-400 hover:text-purple-300 flex items-center gap-2 transition">
+                    Ver Tudo <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {% for filme in em_alta %}
+                <div class="movie-card bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-purple-500/10 group cursor-pointer">
+                    <div class="relative aspect-[2/3]">
+                        <img src="{{ filme.poster }}" 
+                             alt="{{ filme.titulo }}"
+                             class="w-full h-full object-cover">
+                        
+                        <!-- Trending Badge -->
+                        <div class="absolute top-2 left-2">
+                            <span class="bg-red-600 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse">
+                                <i class="fas fa-fire"></i> TRENDING
+                            </span>
+                        </div>
+                        
+                        <!-- Hover Overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                            <form method="POST" action="{% url 'filmes:adicionar_filme_estante' filme.id %}" class="mb-2">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg text-sm transition">
+                                    <i class="fas fa-plus mr-1"></i> Adicionar
+                                </button>
+                            </form>
+                            <a href="{% url 'filmes:filme_detalhes' filme.id %}" class="block bg-gray-700 hover:bg-gray-600 text-white py-2 rounded-lg text-sm transition text-center">
+                                <i class="fas fa-info-circle mr-1"></i> Detalhes
+                            </a>
+                        </div>
+                        
+                        <!-- Rating Badge -->
+                        <div class="absolute top-2 right-2 bg-black bg-opacity-80 text-yellow-400 px-2 py-1 rounded-full text-xs font-bold">
+                            <i class="fas fa-star"></i> {{ filme.nota }}
+                        </div>
+                    </div>
+                    
+                    <div class="p-3">
+                        <h3 class="text-white font-semibold text-sm mb-1 truncate">{{ filme.titulo }}</h3>
+                        <div class="flex justify-between items-center text-xs text-gray-400">
+                            <span>{{ filme.ano }}</span>
+                            <span class="truncate ml-2">{{ filme.genero }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-black bg-opacity-50 border-t border-purple-500/20 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center text-gray-400">
+                <p class="mb-2">
+                    <i class="fas fa-film text-purple-400 mr-2"></i>
+                    <span class="text-white font-bold">CineEstante</span>
+                </p>
+                <p class="text-sm">Sua plataforma de críticas e comentários de filmes</p>
+                <p class="text-xs mt-4">© 2025 CineEstante. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function heroCarousel() {
+            return {
+                currentSlide: 0,
+                autoplayInterval: null,
+                trailerTimer: null,
+                showingTrailer: null,
+                filmes: JSON.parse('{{ filmes_cartaz|escapejs }}'),
+                
+                init() {
+                    console.log('🎬 Hero carousel iniciado!', this.filmes);
+                    if (this.filmes && this.filmes.length > 0) {
+                        this.startAutoplay();
+                    }
+                },
+                
+                startAutoplay() {
+                    // Só inicia autoplay se não estiver mostrando trailer
+                    if (!this.showingTrailer) {
+                        clearInterval(this.autoplayInterval);
+                        this.autoplayInterval = setInterval(() => {
+                            this.nextSlide();
+                        }, 5000);
+                    }
+                },
+                
+                stopAutoplay() {
+                    clearInterval(this.autoplayInterval);
+                    this.autoplayInterval = null;
+                },
+                
+                resetAutoplay() {
+                    this.stopAutoplay();
+                    this.startAutoplay();
+                },
+                
+                startTrailerTimer(index) {
+                    // Só inicia o trailer após 3 segundos
+                    this.trailerTimer = setTimeout(() => {
+                        this.showingTrailer = index;
+                        this.stopAutoplay(); // PAUSA O CARROSSEL quando trailer começar
+                        console.log('🎬 Trailer iniciado! Carrossel pausado.');
+                    }, 3000);
+                },
+                
+                cancelTrailerTimer() {
+                    if (this.trailerTimer) {
+                        clearTimeout(this.trailerTimer);
+                        this.trailerTimer = null;
+                    }
+                    if (this.showingTrailer !== null) {
+                        console.log('🛑 Trailer parado! Carrossel retomado.');
+                        this.showingTrailer = null;
+                        this.startAutoplay(); // RETOMA O CARROSSEL quando trailer para
+                    }
+                },
+                
+                nextSlide() {
+                    this.cancelTrailerTimer();
+                    this.currentSlide = (this.currentSlide + 1) % this.filmes.length;
+                },
+                
+                prevSlide() {
+                    this.cancelTrailerTimer();
+                    this.currentSlide = (this.currentSlide - 1 + this.filmes.length) % this.filmes.length;
+                    this.resetAutoplay();
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
