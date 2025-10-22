@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Estante - CineEstante</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .film-grain {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        }
+        .movie-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .movie-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+        }
+        .movie-poster {
+            aspect-ratio: 2/3;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 min-h-screen film-grain">
+    
+    <!-- Navbar -->
+    <nav class="bg-black bg-opacity-50 backdrop-blur-md border-b border-purple-500/20 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-film text-purple-400 text-2xl"></i>
+                    <span class="text-white text-xl font-bold">CineEstante</span>
+                </div>
+                <div class="flex items-center gap-6">
+                    <a href="/" class="text-gray-300 hover:text-white transition">
+                        <i class="fas fa-home"></i> <span class="hidden sm:inline ml-1">Início</span>
+                    </a>
+                    <a href="/filmes/lista/" class="text-purple-400 font-semibold">
+                        <i class="fas fa-book"></i> <span class="hidden sm:inline ml-1">Estante</span>
+                    </a>
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" class="flex items-center gap-2 text-white">
+                            <img src="{{ request.user.perfil.get_foto_url }}" 
+                                 class="w-8 h-8 rounded-full border-2 border-purple-400 object-cover">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div x-show="open" 
+                             @click.outside="open = false"
+                             x-transition
+                             class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-purple-500/30 py-2 z-50">
+                            <a href="/usuarios/perfil/" class="block px-4 py-2 text-gray-300 hover:bg-purple-600 hover:text-white">
+                                <i class="fas fa-user mr-2"></i> Meu Perfil
+                            </a>
+                            <a href="/usuarios/editar-perfil/" class="block px-4 py-2 text-gray-300 hover:bg-purple-600 hover:text-white">
+                                <i class="fas fa-cog mr-2"></i> Configurações
+                            </a>
+                            <hr class="border-gray-700 my-2">
+                            <a href="/usuarios/logout/" class="block px-4 py-2 text-red-400 hover:bg-red-600 hover:text-white">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Sair
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8" x-data="moviesApp()">
+        
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-3">
+                <i class="fas fa-book-open text-purple-400"></i> Minha Estante
+            </h1>
+            <p class="text-gray-400 text-lg">
+                <span x-text="filteredMovies.length"></span> filmes na sua coleção
+            </p>
+        </div>
+
+        <!-- Filters & Search -->
+        <div class="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20 shadow-xl mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <!-- Search -->
+                <div class="lg:col-span-2">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" 
+                               x-model="filters.search"
+                               @input="applyFilters()"
+                               placeholder="Buscar filmes..."
+                               class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg pl-12 pr-4 py-3 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition">
+                    </div>
+                </div>
+
+                <!-- Genre Filter -->
+                <div>
+                    <select x-model="filters.genre"
+                            @change="applyFilters()"
+                            class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition">
+                        <option value="">Todos os Gêneros</option>
+                        <option value="Ação">Ação</option>
+                        <option value="Aventura">Aventura</option>
+                        <option value="Comédia">Comédia</option>
+                        <option value="Drama">Drama</option>
+                        <option value="Ficção Científica">Ficção Científica</option>
+                        <option value="Terror">Terror</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Suspense">Suspense</option>
+                    </select>
+                </div>
+
+                <!-- Status Filter -->
+                <div>
+                    <select x-model="filters.status"
+                            @change="applyFilters()"
+                            class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition">
+                        <option value="">Todos os Status</option>
+                        <option value="assistido">Assistido</option>
+                        <option value="assistindo">Assistindo</option>
+                        <option value="quero_assistir">Quero Assistir</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Quick Filters -->
+            <div class="flex flex-wrap gap-2 mt-4">
+                <button @click="filters.rating = ''; applyFilters()"
+                        :class="filters.rating === '' ? 'bg-purple-600' : 'bg-gray-700 hover:bg-gray-600'"
+                        class="px-4 py-2 rounded-full text-white text-sm transition">
+                    Todas as Notas
+                </button>
+                <button @click="filters.rating = '5'; applyFilters()"
+                        :class="filters.rating === '5' ? 'bg-purple-600' : 'bg-gray-700 hover:bg-gray-600'"
+                        class="px-4 py-2 rounded-full text-white text-sm transition">
+                    <i class="fas fa-star text-yellow-400"></i> 5 Estrelas
+                </button>
+                <button @click="filters.rating = '4'; applyFilters()"
+                        :class="filters.rating === '4' ? 'bg-purple-600' : 'bg-gray-700 hover:bg-gray-600'"
+                        class="px-4 py-2 rounded-full text-white text-sm transition">
+                    <i class="fas fa-star text-yellow-400"></i> 4+ Estrelas
+                </button>
+                <button @click="clearFilters()"
+                        class="px-4 py-2 rounded-full bg-red-600 hover:bg-red-700 text-white text-sm transition ml-auto">
+                    <i class="fas fa-times mr-1"></i> Limpar Filtros
+                </button>
+            </div>
+        </div>
+
+        <!-- Add Movie Button -->
+        <div class="mb-6">
+            <button class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg transition shadow-lg hover:shadow-purple-500/50 flex items-center gap-2">
+                <i class="fas fa-plus"></i> Adicionar Filme
+            </button>
+        </div>
+
+        <!-- Movies Grid -->
+        <div x-show="filteredMovies.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            <template x-for="movie in filteredMovies" :key="movie.id">
+                <div class="movie-card bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-purple-500/10">
+                    <div class="relative group">
+                        <img :src="movie.poster" 
+                             :alt="movie.title"
+                             class="movie-poster w-full">
+                        
+                        <!-- Overlay on Hover -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                            <div class="flex gap-2">
+                                <button class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg text-sm transition">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 rounded-lg text-sm transition">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Status Badge -->
+                        <div class="absolute top-2 left-2">
+                            <span x-show="movie.status === 'assistido'" 
+                                  class="bg-green-600 text-white text-xs px-2 py-1 rounded-full">
+                                <i class="fas fa-check"></i> Assistido
+                            </span>
+                            <span x-show="movie.status === 'assistindo'" 
+                                  class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                                <i class="fas fa-play"></i> Assistindo
+                            </span>
+                            <span x-show="movie.status === 'quero_assistir'" 
+                                  class="bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
+                                <i class="fas fa-bookmark"></i> Quero Ver
+                            </span>
+                        </div>
+
+                        <!-- Rating Badge -->
+                        <div class="absolute top-2 right-2 bg-black bg-opacity-80 text-yellow-400 px-2 py-1 rounded-full text-xs font-bold">
+                            <i class="fas fa-star"></i> <span x-text="movie.rating"></span>
+                        </div>
+                    </div>
+
+                    <!-- Movie Info -->
+                    <div class="p-4">
+                        <h3 class="text-white font-semibold text-sm mb-1 truncate" x-text="movie.title"></h3>
+                        <div class="flex justify-between items-center text-xs text-gray-400">
+                            <span x-text="movie.year"></span>
+                            <span x-text="movie.genre" class="truncate ml-2"></span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Empty State -->
+        <div x-show="filteredMovies.length === 0" 
+             class="text-center py-16">
+            <i class="fas fa-film text-gray-600 text-6xl mb-4"></i>
+            <h3 class="text-white text-2xl font-semibold mb-2">Nenhum filme encontrado</h3>
+            <p class="text-gray-400 mb-6">Tente ajustar seus filtros ou adicione novos filmes à sua estante</p>
+            <button class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg transition">
+                <i class="fas fa-plus mr-2"></i> Adicionar Primeiro Filme
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function moviesApp() {
+            return {
+                movies: [
+                    {
+                        id: 1,
+                        title: 'Interestelar',
+                        year: 2014,
+                        genre: 'Ficção Científica',
+                        rating: 5,
+                        status: 'assistido',
+                        poster: 'https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg'
+                    },
+                    {
+                        id: 2,
+                        title: 'O Poderoso Chefão',
+                        year: 1972,
+                        genre: 'Drama',
+                        rating: 5,
+                        status: 'assistido',
+                        poster: 'https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg'
+                    },
+                    {
+                        id: 3,
+                        title: 'A Origem',
+                        year: 2010,
+                        genre: 'Ficção Científica',
+                        rating: 5,
+                        status: 'assistido',
+                        poster: 'https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg'
+                    },
+                    {
+                        id: 4,
+                        title: 'Parasita',
+                        year: 2019,
+                        genre: 'Suspense',
+                        rating: 5,
+                        status: 'assistido',
+                        poster: 'https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg'
+                    },
+                    {
+                        id: 5,
+                        title: 'Vingadores: Ultimato',
+                        year: 2019,
+                        genre: 'Ação',
+                        rating: 4,
+                        status: 'assistindo',
+                        poster: 'https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg'
+                    },
+                    {
+                        id: 6,
+                        title: 'Clube da Luta',
+                        year: 1999,
+                        genre: 'Drama',
+                        rating: 5,
+                        status: 'assistido',
+                        poster: 'https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg'
+                    },
+                    {
+                        id: 7,
+                        title: 'Coringa',
+                        year: 2019,
+                        genre: 'Drama',
+                        rating: 4,
+                        status: 'quero_assistir',
+                        poster: 'https://image.tmdb.org/t/p/w500/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg'
+                    },
+                    {
+                        id: 8,
+                        title: 'Matrix',
+                        year: 1999,
+                        genre: 'Ficção Científica',
+                        rating: 5,
+                        status: 'assistido',
+                        poster: 'https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg'
+                    },
+                    {
+                        id: 9,
+                        title: 'Pulp Fiction',
+                        year: 1994,
+                        genre: 'Drama',
+                        rating: 5,
+                        status: 'assistido',
+                        poster: 'https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg'
+                    },
+                    {
+                        id: 10,
+                        title: 'Duna',
+                        year: 2021,
+                        genre: 'Ficção Científica',
+                        rating: 4,
+                        status: 'quero_assistir',
+                        poster: 'https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg'
+                    }
+                ],
+                filteredMovies: [],
+                filters: {
+                    search: '',
+                    genre: '',
+                    status: '',
+                    rating: ''
+                },
+
+                init() {
+                    this.filteredMovies = [...this.movies];
+                },
+
+                applyFilters() {
+                    this.filteredMovies = this.movies.filter(movie => {
+                        // Search filter
+                        if (this.filters.search && !movie.title.toLowerCase().includes(this.filters.search.toLowerCase())) {
+                            return false;
+                        }
+
+                        // Genre filter
+                        if (this.filters.genre && movie.genre !== this.filters.genre) {
+                            return false;
+                        }
+
+                        // Status filter
+                        if (this.filters.status && movie.status !== this.filters.status) {
+                            return false;
+                        }
+
+                        // Rating filter
+                        if (this.filters.rating === '5' && movie.rating !== 5) {
+                            return false;
+                        }
+                        if (this.filters.rating === '4' && movie.rating < 4) {
+                            return false;
+                        }
+
+                        return true;
+                    });
+                },
+
+                clearFilters() {
+                    this.filters = {
+                        search: '',
+                        genre: '',
+                        status: '',
+                        rating: ''
+                    };
+                    this.applyFilters();
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
