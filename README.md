@@ -95,7 +95,7 @@ Como usuário, quero visualizar um carrossel de filmes em formato de cartas, par
 ---
 
 ### 7. Visualizar Trailers ao Passar o Mouse  
-Como usuário, quero visualizar trailers dos filmes ao deixar o mouse sobre o pôster, para ter uma prévia rápida da obra.  
+Como usuário, quero visualizar trailers dos filmesem cartaz no carrosel ao deixar o mouse sobre o pôster, para ter uma prévia rápida da obra.  
 
 ---
 
