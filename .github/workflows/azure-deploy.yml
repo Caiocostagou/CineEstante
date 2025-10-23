@@ -18,14 +18,13 @@ jobs:
         with:
           python-version: '3.11'
       
-      # NÃO vamos criar venv ou instalar pacotes aqui.
-      # Apenas limpamos os arquivos que não queremos enviar.
+      # Limpa arquivos de teste/locais
       - name: Cleaning testing files
         run: |
           rm -f db.sqlite3
           rm -f .env
       
-      # Compactamos o código-fonte LIMPO
+      # Apenas compacta o código-fonte, excluindo o venv, .git, etc.
       - name: Zip artifact for deployment
         run: zip release.zip . -r -x "venv/*" -x ".git/*" -x "__pycache__/*"
 
@@ -33,7 +32,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: release.zip # Apenas o zip
+          path: release.zip # Sobe apenas o arquivo zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -48,10 +47,9 @@ jobs:
         with:
           name: python-app
       
-      # O 'unzip' foi removido, a action de deploy usa o zip diretamente.
-      # - name: Unzip artifact for deployment
-      #   run: unzip release.zip
-
+      # Esta é a ação de deploy limpa.
+      # Ela apenas envia o 'release.zip'.
+      # A Azure vai detectar o 'requirements.txt' dentro do zip e instalar tudo sozinha.
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
@@ -59,16 +57,7 @@ jobs:
           app-name: 'cineestante-app'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          package: release.zip # Dizemos para a action usar o zip
-          
-          # --- ESTA É A MÁGICA ---
-          # 1. Diz para a Azure rodar o build (instalar o requirements.txt) LÁ NO SERVIDOR
-          scm-do-build-during-deployment: true
-          
-          # 2. Roda os comandos DEPOIS que a Azure instalar os pacotes
-          post-build-command: |
-            echo "Build finalizado, rodando migrações..."
-            python manage.py migrate
-            echo "Migrações finalizadas, populando filmes..."
-            python manage.py popular_filmes
-            echo "Comandos pós-build finalizados."
+          package: release.zip 
+          # TODOS os comandos 'scm-do-build-during-deployment' e 'post-build-command'
+          # foram removidos porque estavam errados.
+
