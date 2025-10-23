@@ -23,8 +23,9 @@ jobs:
           rm -f db.sqlite3
           rm -f .env
       
+      # Vamos zipar o código fonte PURO, sem venv, sem .git
       - name: Zip artifact for deployment
-        run: zip release.zip . -r -x "venv/*" -x ".git/*" -x "__pycache__/*"
+        run: zip release.zip . -r -x "venv/*" -x ".git/*" -x "__pycache__/*" -x ".vscode/*"
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
@@ -54,7 +55,7 @@ jobs:
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: release.zip
           
-          # ESTA É A LINHA QUE FALTAVA!
-          # Ela diz ao Azure para rodar o build (pip install)
+          # ESTA É A LINHA QUE VAI CONSERTAR TUDO!
+          # Ela força a Azure a rodar o "pip install -r requirements.txt"
           scm-do-build-during-deployment: true
 
