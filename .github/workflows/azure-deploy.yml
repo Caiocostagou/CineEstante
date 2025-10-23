@@ -18,13 +18,11 @@ jobs:
         with:
           python-version: '3.11'
       
-      # Limpa arquivos de teste/locais
       - name: Cleaning testing files
         run: |
           rm -f db.sqlite3
           rm -f .env
       
-      # Apenas compacta o código-fonte, excluindo o venv, .git, etc.
       - name: Zip artifact for deployment
         run: zip release.zip . -r -x "venv/*" -x ".git/*" -x "__pycache__/*"
 
@@ -32,7 +30,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: release.zip # Sobe apenas o arquivo zip
+          path: release.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -47,9 +45,6 @@ jobs:
         with:
           name: python-app
       
-      # Esta é a ação de deploy limpa.
-      # Ela apenas envia o 'release.zip'.
-      # A Azure vai detectar o 'requirements.txt' dentro do zip e instalar tudo sozinha.
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
@@ -57,7 +52,9 @@ jobs:
           app-name: 'cineestante-app'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          package: release.zip 
-          # TODOS os comandos 'scm-do-build-during-deployment' e 'post-build-command'
-          # foram removidos porque estavam errados.
+          package: release.zip
+          
+          # ESTA É A LINHA QUE FALTAVA!
+          # Ela diz ao Azure para rodar o build (pip install)
+          scm-do-build-during-deployment: true
 
