@@ -102,7 +102,10 @@ Como usuário, quero visualizar trailers dos filmesem cartaz no carrosel ao deix
 ## 📋 JIRA e GitHub
 
 - **JIRA (Sprint 03):**  
-  ![Sprint 03 - JIRA](https://github.com/user-attachments/assets/SEU-LINK-AQUI)
+  ![Sprint 03 - JIRA](https://github.com/user-attachments/assets/a52af239-40f3-46c3-b829-59c079b56fef)
+
+  ![Sprint 03 - JIRA](https://github.com/user-attachments/assets/0789d911-eadb-4422-8522-f35e2a9e5324)
+
 
 - **GitHub Issues:**  
   ![GitHub Issues](https://github.com/user-attachments/assets/SEU-LINK-AQUI)
